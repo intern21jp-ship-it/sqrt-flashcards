@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>平方根フラッシュカード</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      text-align: center;
+      background: #f5f7fb;
+      margin: 0;
+      padding: 24px;
+    }
+    h1 {
+      margin-bottom: 8px;
+    }
+    .card {
+      background: white;
+      max-width: 520px;
+      margin: 24px auto;
+      padding: 32px 24px;
+      border-radius: 18px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+    }
+    .mode {
+      margin: 16px 0;
+    }
+    button {
+      font-size: 18px;
+      padding: 10px 18px;
+      margin: 6px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      cursor: pointer;
+    }
+    .main {
+      font-size: 56px;
+      margin: 30px 0;
+      min-height: 72px;
+    }
+    .answer {
+      font-size: 42px;
+      margin: 24px 0;
+      color: #1f5fbf;
+      min-height: 56px;
+    }
+    .small {
+      color: #666;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <h1>平方根フラッシュカード</h1>
+  <p>根号の中を簡単にする練習</p>
+
+  <div class="mode">
+    <button onclick="setMode('basic')">基本</button>
+    <button onclick="setMode('standard')">標準</button>
+    <button onclick="setMode('all')">基本＋標準</button>
+  </div>
+
+  <div class="card">
+    <div class="small" id="modeLabel">基本モード</div>
+    <div class="main" id="question">√8</div>
+    <div class="answer" id="answer">?</div>
+    <button onclick="showAnswer()">答えを見る</button>
+    <button onclick="nextQuestion()">次の問題</button>
+  </div>
+
+  <script>
+    const basic = [
+      [8, "2√2"], [12, "2√3"], [18, "3√2"], [20, "2√5"],
+      [24, "2√6"], [27, "3√3"], [28, "2√7"], [32, "4√2"],
+      [45, "3√5"], [48, "4√3"], [50, "5√2"], [75, "5√3"]
+    ];
+
+    const standard = [
+      [40, "2√10"], [44, "2√11"], [52, "2√13"], [54, "3√6"],
+      [56, "2√14"], [63, "3√7"], [68, "2√17"], [72, "6√2"],
+      [80, "4√5"], [88, "2√22"], [92, "2√23"], [96, "4√6"]
+    ];
+
+    let mode = "basic";
+    let currentList = basic;
+    let current = basic[0];
+
+    function setMode(newMode) {
+      mode = newMode;
+      if (mode === "basic") {
+        currentList = basic;
+        document.getElementById("modeLabel").textContent = "基本モード";
+      } else if (mode === "standard") {
+        currentList = standard;
+        document.getElementById("modeLabel").textContent = "標準モード";
+      } else {
+        currentList = basic.concat(standard);
+        document.getElementById("modeLabel").textContent = "基本＋標準モード";
+      }
+      nextQuestion();
+    }
+
+    function nextQuestion() {
+      const index = Math.floor(Math.random() * currentList.length);
+      current = currentList[index];
+      document.getElementById("question").textContent = "√" + current[0];
+      document.getElementById("answer").textContent = "?";
+    }
+
+    function showAnswer() {
+      document.getElementById("answer").textContent = current[1];
+    }
+
+    nextQuestion();
+  </script>
+</body>
+</html>
