@@ -1,117 +1,553 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <title>平方根フラッシュカード</title>
-  <style>
-    body {
-      font-family: system-ui, sans-serif;
-      text-align: center;
-      background: #f5f7fb;
-      margin: 0;
-      padding: 24px;
-    }
-    h1 {
-      margin-bottom: 8px;
-    }
-    .card {
-      background: white;
-      max-width: 520px;
-      margin: 24px auto;
-      padding: 32px 24px;
-      border-radius: 18px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.15);
-    }
-    .mode {
-      margin: 16px 0;
-    }
-    button {
-      font-size: 18px;
-      padding: 10px 18px;
-      margin: 6px;
-      border-radius: 10px;
-      border: 1px solid #ccc;
-      cursor: pointer;
-    }
-    .main {
-      font-size: 56px;
-      margin: 30px 0;
-      min-height: 72px;
-    }
-    .answer {
-      font-size: 42px;
-      margin: 24px 0;
-      color: #1f5fbf;
-      min-height: 56px;
-    }
-    .small {
-      color: #666;
-      font-size: 14px;
-    }
-  </style>
-</head>
-<body>
-  <h1>平方根フラッシュカード</h1>
-  <p>根号の中を簡単にする練習</p>
+<style>
+  #sqrtFlashApp {
+    --bg1: #eff6ff;
+    --bg2: #ecfeff;
+    --card: #ffffff;
+    --text: #111827;
+    --muted: #64748b;
+    --accent: #2563eb;
+    --border: #bfdbfe;
+    --shadow: 0 20px 48px rgba(37, 99, 235, 0.16);
+    width: 100%;
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 14px;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
+    color: var(--text);
+    background:
+      radial-gradient(circle at top left, rgba(96, 165, 250, 0.22), transparent 34%),
+      linear-gradient(135deg, var(--bg1), var(--bg2));
+    border-radius: 28px;
+    box-sizing: border-box;
+  }
 
-  <div class="mode">
-    <button onclick="setMode('basic')">基本</button>
-    <button onclick="setMode('standard')">標準</button>
-    <button onclick="setMode('all')">基本＋標準</button>
+  #sqrtFlashApp * {
+    box-sizing: border-box;
+  }
+
+  #sqrtFlashApp .sfa-header {
+    text-align: center;
+    margin-bottom: 14px;
+  }
+
+  #sqrtFlashApp .sfa-title {
+    margin: 0;
+    color: #1e3a8a;
+    font-size: clamp(2rem, 5.8vw, 3.2rem);
+    line-height: 1.15;
+    letter-spacing: 0.04em;
+    font-weight: 900;
+  }
+
+  #sqrtFlashApp .sfa-subtitle {
+    margin: 8px 0 0;
+    color: var(--muted);
+    font-size: clamp(0.98rem, 2.8vw, 1.2rem);
+    font-weight: 700;
+  }
+
+  #sqrtFlashApp .sfa-controls {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    max-width: 760px;
+    margin: 0 auto 12px;
+  }
+
+  #sqrtFlashApp .sfa-select-box {
+    background: rgba(255,255,255,0.9);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 10px 12px;
+    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.05);
+  }
+
+  #sqrtFlashApp .sfa-select-box label {
+    display: block;
+    margin-bottom: 6px;
+    color: #334155;
+    font-size: 0.92rem;
+    font-weight: 900;
+  }
+
+  #sqrtFlashApp select {
+    width: 100%;
+    min-height: 48px;
+    border: 2px solid #cfe1ff;
+    border-radius: 14px;
+    background: white;
+    padding: 8px 12px;
+    font-size: 1rem;
+    font-weight: 900;
+    color: #1e3a8a;
+    outline: none;
+  }
+
+  #sqrtFlashApp .sfa-status {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    max-width: 760px;
+    margin: 0 auto 12px;
+  }
+
+  #sqrtFlashApp .sfa-pill {
+    background: rgba(255,255,255,0.92);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 8px 14px;
+    color: #334155;
+    font-weight: 900;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
+  }
+
+  #sqrtFlashApp .sfa-card {
+    width: 100%;
+    min-height: min(66vh, 580px);
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 34px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(22px, 5vw, 52px);
+    cursor: pointer;
+    user-select: none;
+    touch-action: manipulation;
+    transition: transform 0.08s ease, box-shadow 0.08s ease;
+  }
+
+  #sqrtFlashApp .sfa-card:active {
+    transform: scale(0.992);
+    box-shadow: 0 14px 34px rgba(37, 99, 235, 0.2);
+  }
+
+  #sqrtFlashApp .sfa-label {
+    font-size: clamp(1.2rem, 3.8vw, 2rem);
+    color: var(--muted);
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    margin-bottom: 28px;
+    text-align: center;
+  }
+
+  #sqrtFlashApp .sfa-formula-img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    -webkit-user-drag: none;
+    user-select: none;
+  }
+
+  #sqrtFlashApp .sfa-guide {
+    margin-top: 28px;
+    color: #475569;
+    font-size: clamp(1rem, 2.8vw, 1.18rem);
+    font-weight: 800;
+    text-align: center;
+    line-height: 1.7;
+  }
+
+  #sqrtFlashApp .sfa-reset {
+    margin: 16px auto 0;
+    display: block;
+    border: none;
+    border-radius: 999px;
+    background: var(--accent);
+    color: white;
+    font-size: 1rem;
+    font-weight: 900;
+    padding: 12px 24px;
+    cursor: pointer;
+    box-shadow: 0 8px 0 rgba(15, 23, 42, 0.16);
+  }
+
+  #sqrtFlashApp .sfa-reset:active {
+    transform: translateY(4px);
+    box-shadow: 0 4px 0 rgba(15, 23, 42, 0.18);
+  }
+
+  #sqrtFlashApp .sfa-finish-title {
+    margin: 0 0 10px;
+    color: #166534;
+    font-size: clamp(2.2rem, 7vw, 4rem);
+    font-weight: 900;
+  }
+
+  @media (max-width: 720px) {
+    #sqrtFlashApp .sfa-controls {
+      grid-template-columns: 1fr;
+    }
+
+    #sqrtFlashApp .sfa-card {
+      min-height: 58vh;
+      border-radius: 26px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    #sqrtFlashApp {
+      padding: 10px;
+    }
+
+    #sqrtFlashApp .sfa-status {
+      font-size: 0.92rem;
+    }
+  }
+</style>
+
+<div id="sqrtFlashApp">
+  <div class="sfa-header">
+    <h1 class="sfa-title">平方根フラッシュカード</h1>
+    <p class="sfa-subtitle">カードをクリックして、問題 → 答え → 次の問題</p>
   </div>
 
-  <div class="card">
-    <div class="small" id="modeLabel">基本モード</div>
-    <div class="main" id="question">√8</div>
-    <div class="answer" id="answer">?</div>
-    <button onclick="showAnswer()">答えを見る</button>
-    <button onclick="nextQuestion()">次の問題</button>
+  <section class="sfa-controls" aria-label="設定">
+    <div class="sfa-select-box">
+      <label for="sfaLevelSelect">難易度</label>
+      <select id="sfaLevelSelect">
+        <option value="all">全部</option>
+        <option value="1">基本</option>
+        <option value="2">標準</option>
+        <option value="12">基本＋標準</option>
+        <option value="3">発展</option>
+      </select>
+    </div>
+
+    <div class="sfa-select-box">
+      <label for="sfaTypeSelect">問題タイプ</label>
+      <select id="sfaTypeSelect">
+        <option value="out">外に出す（√8 → 2√2）</option>
+        <option value="in">中に入れる（2√2 → √8）</option>
+        <option value="mixed">両方ミックス</option>
+      </select>
+    </div>
+  </section>
+
+  <div class="sfa-status">
+    <div class="sfa-pill" id="sfaModeText">問題</div>
+    <div class="sfa-pill" id="sfaProgressText">1 / 1</div>
   </div>
 
-  <script>
-    const basic = [
-      [8, "2√2"], [12, "2√3"], [18, "3√2"], [20, "2√5"],
-      [24, "2√6"], [27, "3√3"], [28, "2√7"], [32, "4√2"],
-      [45, "3√5"], [48, "4√3"], [50, "5√2"], [75, "5√3"]
-    ];
+  <section class="sfa-card" id="sfaFlashCard" aria-label="フラッシュカード">
+    <div class="sfa-label" id="sfaLabelText">問題</div>
+    <img id="sfaFormulaImg" class="sfa-formula-img" alt="数式" />
+    <div class="sfa-guide" id="sfaGuideText">クリックすると答えが出ます</div>
+  </section>
 
-    const standard = [
-      [40, "2√10"], [44, "2√11"], [52, "2√13"], [54, "3√6"],
-      [56, "2√14"], [63, "3√7"], [68, "2√17"], [72, "6√2"],
-      [80, "4√5"], [88, "2√22"], [92, "2√23"], [96, "4√6"]
-    ];
+  <button class="sfa-reset" id="sfaResetBtn">最初から</button>
+</div>
 
-    let mode = "basic";
-    let currentList = basic;
-    let current = basic[0];
+<script>
+(function () {
+  const cards = [
+    // 基本
+    { question: 8, answerCoef: 2, answerRadicand: 2, level: 1 },
+    { question: 12, answerCoef: 2, answerRadicand: 3, level: 1 },
+    { question: 18, answerCoef: 3, answerRadicand: 2, level: 1 },
+    { question: 20, answerCoef: 2, answerRadicand: 5, level: 1 },
+    { question: 24, answerCoef: 2, answerRadicand: 6, level: 1 },
+    { question: 27, answerCoef: 3, answerRadicand: 3, level: 1 },
+    { question: 28, answerCoef: 2, answerRadicand: 7, level: 1 },
+    { question: 32, answerCoef: 4, answerRadicand: 2, level: 1 },
+    { question: 45, answerCoef: 3, answerRadicand: 5, level: 1 },
+    { question: 48, answerCoef: 4, answerRadicand: 3, level: 1 },
+    { question: 50, answerCoef: 5, answerRadicand: 2, level: 1 },
 
-    function setMode(newMode) {
-      mode = newMode;
-      if (mode === "basic") {
-        currentList = basic;
-        document.getElementById("modeLabel").textContent = "基本モード";
-      } else if (mode === "standard") {
-        currentList = standard;
-        document.getElementById("modeLabel").textContent = "標準モード";
-      } else {
-        currentList = basic.concat(standard);
-        document.getElementById("modeLabel").textContent = "基本＋標準モード";
+    // 標準
+    { question: 40, answerCoef: 2, answerRadicand: 10, level: 2 },
+    { question: 54, answerCoef: 3, answerRadicand: 6, level: 2 },
+    { question: 56, answerCoef: 2, answerRadicand: 14, level: 2 },
+    { question: 63, answerCoef: 3, answerRadicand: 7, level: 2 },
+    { question: 72, answerCoef: 6, answerRadicand: 2, level: 2 },
+    { question: 75, answerCoef: 5, answerRadicand: 3, level: 2 },
+    { question: 80, answerCoef: 4, answerRadicand: 5, level: 2 },
+    { question: 96, answerCoef: 4, answerRadicand: 6, level: 2 },
+    { question: 98, answerCoef: 7, answerRadicand: 2, level: 2 },
+    { question: 200, answerCoef: 10, answerRadicand: 2, level: 2 },
+
+    // 発展
+    { question: 108, answerCoef: 6, answerRadicand: 3, level: 3 },
+    { question: 112, answerCoef: 4, answerRadicand: 7, level: 3 },
+    { question: 125, answerCoef: 5, answerRadicand: 5, level: 3 },
+    { question: 128, answerCoef: 8, answerRadicand: 2, level: 3 },
+    { question: 147, answerCoef: 7, answerRadicand: 3, level: 3 },
+    { question: 162, answerCoef: 9, answerRadicand: 2, level: 3 },
+    { question: 175, answerCoef: 5, answerRadicand: 7, level: 3 },
+    { question: 180, answerCoef: 6, answerRadicand: 5, level: 3 },
+    { question: 192, answerCoef: 8, answerRadicand: 3, level: 3 },
+    { question: 196, answerCoef: 14, answerRadicand: 1, level: 3 }
+  ];
+
+  const levelNames = {
+    all: "全部",
+    1: "基本",
+    2: "標準",
+    12: "基本＋標準",
+    3: "発展"
+  };
+
+  const typeNames = {
+    out: "外に出す",
+    in: "中に入れる",
+    mixed: "ミックス"
+  };
+
+  const levelSelect = document.getElementById("sfaLevelSelect");
+  const typeSelect = document.getElementById("sfaTypeSelect");
+  const flashCard = document.getElementById("sfaFlashCard");
+  const formulaImg = document.getElementById("sfaFormulaImg");
+  const labelText = document.getElementById("sfaLabelText");
+  const guideText = document.getElementById("sfaGuideText");
+  const modeText = document.getElementById("sfaModeText");
+  const progressText = document.getElementById("sfaProgressText");
+  const resetBtn = document.getElementById("sfaResetBtn");
+
+  let deck = [];
+  let index = 0;
+  let showingAnswer = false;
+  let finished = false;
+
+  function shuffle(array) {
+    const arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  function buildDeck() {
+    const selectedLevel = levelSelect.value;
+    const selectedType = typeSelect.value;
+
+    const filtered = cards.filter(card => {
+      if (selectedLevel === "all") return true;
+      if (selectedLevel === "12") return card.level === 1 || card.level === 2;
+      return String(card.level) === selectedLevel;
+    });
+
+    const typed = [];
+    filtered.forEach(card => {
+      if (selectedType === "out" || selectedType === "mixed") {
+        typed.push({ ...card, type: "out" });
       }
-      nextQuestion();
+      if (selectedType === "in" || selectedType === "mixed") {
+        typed.push({ ...card, type: "in" });
+      }
+    });
+
+    deck = shuffle(typed);
+    index = 0;
+    showingAnswer = false;
+    finished = false;
+
+    if (deck.length === 0) {
+      finishEmpty();
+    } else {
+      showQuestion();
+    }
+  }
+
+  function currentCard() {
+    return deck[index];
+  }
+
+  function makeQuestionTokens(card) {
+    if (card.type === "out") {
+      return [{ type: "radical", value: card.question }];
+    }
+    return answerTokens(card);
+  }
+
+  function makeAnswerTokens(card) {
+    if (card.type === "out") {
+      return answerTokens(card);
+    }
+    return [{ type: "radical", value: card.question }];
+  }
+
+  function answerTokens(card) {
+    if (card.answerRadicand === 1) {
+      return [{ type: "text", value: String(card.answerCoef) }];
+    }
+    const tokens = [];
+    if (card.answerCoef !== 1) {
+      tokens.push({ type: "text", value: String(card.answerCoef) });
+    }
+    tokens.push({ type: "radical", value: card.answerRadicand });
+    return tokens;
+  }
+
+  function pickFontSizeForTokens(tokens, baseSize) {
+    const lengthScore = tokens.reduce((sum, t) => {
+      return sum + String(t.value).length + (t.type === "radical" ? 1 : 0);
+    }, 0);
+
+    if (lengthScore <= 3) return baseSize;
+    if (lengthScore <= 5) return Math.round(baseSize * 0.92);
+    if (lengthScore <= 7) return Math.round(baseSize * 0.84);
+    return Math.round(baseSize * 0.76);
+  }
+
+  function showQuestion() {
+    const card = currentCard();
+    showingAnswer = false;
+    const tokens = makeQuestionTokens(card);
+
+    labelText.textContent = "問題";
+    modeText.textContent = `${levelNames[levelSelect.value]}・${typeNames[typeSelect.value]}・問題`;
+    progressText.textContent = `${index + 1} / ${deck.length}`;
+    guideText.textContent = "クリックすると答えが出ます";
+    formulaImg.style.display = "block";
+    formulaImg.src = createFormulaImage(tokens, pickFontSizeForTokens(tokens, 170), "#111827");
+  }
+
+  function showAnswer() {
+    const card = currentCard();
+    showingAnswer = true;
+    const tokens = makeAnswerTokens(card);
+
+    labelText.textContent = "答え";
+    modeText.textContent = `${levelNames[levelSelect.value]}・${typeNames[typeSelect.value]}・答え`;
+    guideText.textContent = "クリックすると次の問題へ進みます";
+    formulaImg.src = createFormulaImage(tokens, pickFontSizeForTokens(tokens, 154), "#111827");
+  }
+
+  function next() {
+    if (finished) return;
+
+    if (!showingAnswer) {
+      showAnswer();
+      return;
     }
 
-    function nextQuestion() {
-      const index = Math.floor(Math.random() * currentList.length);
-      current = currentList[index];
-      document.getElementById("question").textContent = "√" + current[0];
-      document.getElementById("answer").textContent = "?";
+    index += 1;
+    if (index >= deck.length) {
+      finish();
+    } else {
+      showQuestion();
+    }
+  }
+
+  function finish() {
+    finished = true;
+    labelText.textContent = "終了";
+    modeText.textContent = `${levelNames[levelSelect.value]}・${typeNames[typeSelect.value]}・終了`;
+    progressText.textContent = `${deck.length} / ${deck.length}`;
+    formulaImg.style.display = "none";
+    guideText.innerHTML = `<p class="sfa-finish-title">学習完了！</p><div>「最初から」で、もう一度できます。</div>`;
+  }
+
+  function finishEmpty() {
+    finished = true;
+    labelText.textContent = "問題なし";
+    modeText.textContent = "問題なし";
+    progressText.textContent = `0 / 0`;
+    formulaImg.style.display = "none";
+    guideText.innerHTML = `<div>この条件の問題はありません。</div>`;
+  }
+
+  function createFormulaImage(tokens, fontSize, color) {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    const dpr = window.devicePixelRatio || 1;
+    const fontFamily = '"Times New Roman", "Yu Mincho", "Hiragino Mincho ProN", serif';
+    const gap = fontSize * 0.13;
+    const padding = fontSize * 0.26;
+
+    ctx.font = `700 ${fontSize}px ${fontFamily}`;
+
+    function textWidth(text) {
+      return ctx.measureText(String(text)).width;
     }
 
-    function showAnswer() {
-      document.getElementById("answer").textContent = current[1];
+    function measure(token) {
+      if (token.type === "text") return textWidth(token.value);
+      const w = textWidth(token.value);
+      return fontSize * 0.62 + w + fontSize * 0.34;
     }
 
-    nextQuestion();
-  </script>
-</body>
-</html>
+    const widths = tokens.map(measure);
+    const totalWidth = widths.reduce((a, b) => a + b, 0)
+      + gap * Math.max(0, tokens.length - 1)
+      + padding * 2;
+    const totalHeight = fontSize * 1.62 + padding * 2;
+
+    canvas.width = Math.ceil(totalWidth * dpr);
+    canvas.height = Math.ceil(totalHeight * dpr);
+    canvas.style.width = `${Math.ceil(totalWidth)}px`;
+    canvas.style.height = `${Math.ceil(totalHeight)}px`;
+    ctx.scale(dpr, dpr);
+
+    ctx.clearRect(0, 0, totalWidth, totalHeight);
+    ctx.fillStyle = color;
+    ctx.strokeStyle = color;
+    ctx.font = `700 ${fontSize}px ${fontFamily}`;
+    ctx.textBaseline = "alphabetic";
+    ctx.lineWidth = Math.max(2.6, fontSize * 0.05);
+    ctx.lineCap = "square";
+    ctx.lineJoin = "miter";
+    ctx.miterLimit = 5;
+
+    let x = padding;
+    const baseline = padding + fontSize * 1.1;
+
+    for (let i = 0; i < tokens.length; i++) {
+      const token = tokens[i];
+
+      if (token.type === "text") {
+        ctx.fillText(token.value, x, baseline);
+        x += widths[i] + gap;
+        continue;
+      }
+
+      const n = String(token.value);
+      const nWidth = textWidth(n);
+      const rootX = x;
+      const topY = baseline - fontSize * 0.92;
+      const hookY = baseline - fontSize * 0.30;
+      const bottomY = baseline - fontSize * 0.04;
+      const checkX1 = rootX + fontSize * 0.08;
+      const checkX2 = rootX + fontSize * 0.22;
+      const checkX3 = rootX + fontSize * 0.37;
+      const barStartX = rootX + fontSize * 0.54;
+      const barEndX = barStartX + nWidth + fontSize * 0.24;
+      const textX = barStartX + fontSize * 0.09;
+
+      ctx.beginPath();
+      ctx.moveTo(checkX1, hookY);
+      ctx.lineTo(checkX2, bottomY);
+      ctx.lineTo(checkX3, topY + fontSize * 0.42);
+      ctx.lineTo(barStartX, topY);
+      ctx.lineTo(barEndX, topY);
+      ctx.stroke();
+
+      ctx.fillText(n, textX, baseline);
+      x += widths[i] + gap;
+    }
+
+    return canvas.toDataURL("image/png");
+  }
+
+  flashCard.addEventListener("click", next);
+
+  resetBtn.addEventListener("click", function (e) {
+    e.stopPropagation();
+    buildDeck();
+  });
+
+  levelSelect.addEventListener("change", buildDeck);
+  typeSelect.addEventListener("change", buildDeck);
+
+  window.addEventListener("resize", function () {
+    if (finished) return;
+    showingAnswer ? showAnswer() : showQuestion();
+  });
+
+  buildDeck();
+})();
+</script>
